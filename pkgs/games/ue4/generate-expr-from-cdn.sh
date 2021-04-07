@@ -30,7 +30,6 @@ cat <<EOF
 EOF
 
 go Engine/Build/Commit.gitdeps.xml
-go Engine/Build/Promoted.gitdeps.xml
 
 cat <<EOF
 }
