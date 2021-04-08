@@ -32,7 +32,10 @@ stdenv.mkDerivation rec {
     ${unzip}/bin/unzip $src
   '';
 
-  patches = [ ./use-system-compiler.patch ];
+  patches = [
+    ./use-system-compiler.patch
+    ./no-unused-result-error.patch
+  ];
 
   configurePhase = ''
     ${linkDeps}
