@@ -1,4 +1,4 @@
-{ lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld, mono, which,
+{ lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
   xorg, xdg-user-dirs }:
 
 let
@@ -87,7 +87,7 @@ stdenv.mkDerivation rec {
 
     cp -r . "$sharedir"
   '';
-  buildInputs = [ clang_10 lld mono which xdg-user-dirs ];
+  buildInputs = [ clang_10 lld_10 mono which xdg-user-dirs ];
 
   meta = {
     description = "A suite of integrated tools for game developers to design and build games, simulations, and visualizations";
