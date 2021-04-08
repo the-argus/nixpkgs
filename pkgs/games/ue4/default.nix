@@ -1,4 +1,4 @@
-{ lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, mono, which,
+{ lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld, mono, which,
   xorg, xdg-user-dirs }:
 
 let
@@ -50,6 +50,9 @@ stdenv.mkDerivation rec {
     patchShebangs Setup.sh
     patchShebangs Engine/Build/BatchFiles/Linux
     ./Setup.sh
+
+    find Engine/Binaries/Linux -type f -executable -exec patchelf --interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" {} \;
+
     ./GenerateProjectFiles.sh
   '';
 
@@ -81,7 +84,7 @@ stdenv.mkDerivation rec {
 
     cp -r . "$sharedir"
   '';
-  buildInputs = [ clang_10 mono which xdg-user-dirs ];
+  buildInputs = [ clang_10 lld mono which xdg-user-dirs ];
 
   meta = {
     description = "A suite of integrated tools for game developers to design and build games, simulations, and visualizations";
