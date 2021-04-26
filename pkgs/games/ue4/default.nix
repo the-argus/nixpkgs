@@ -1,5 +1,5 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
-  xorg, xdg-user-dirs }:
+  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio }:
 
 let
   deps = import ./cdn-deps.nix { inherit fetchurl; };
@@ -13,7 +13,7 @@ let
   libPath = lib.makeLibraryPath [
     xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
     xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm
-    xorg.libxcb
+    xorg.libxcb vulkan-loader libpulseaudio
   ];
 in
 stdenv.mkDerivation rec {
@@ -33,6 +33,7 @@ stdenv.mkDerivation rec {
   '';
 
   patches = [
+    ./dont-link-system-stdc++.patch
     ./use-system-compiler.patch
     ./no-unused-result-error.patch
   ];
@@ -55,6 +56,7 @@ stdenv.mkDerivation rec {
     ./Setup.sh
 
     find Engine/Binaries/Linux -type f -executable -exec patchelf --interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" {} \;
+    patchelf --interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" Engine/Source/ThirdParty/Intel/ISPC/bin/Linux/ispc
 
     ./GenerateProjectFiles.sh
   '';
@@ -88,6 +90,9 @@ stdenv.mkDerivation rec {
     cp -r . "$sharedir"
   '';
   buildInputs = [ clang_10 lld_10 mono which xdg-user-dirs ];
+
+  # Disable FORTIFY_SOURCE or `SharedPCH.UnrealEd.NonOptimized.ShadowErrors.h` fails to compile
+  hardeningDisable = [ "fortify" ];
 
   meta = {
     description = "A suite of integrated tools for game developers to design and build games, simulations, and visualizations";
