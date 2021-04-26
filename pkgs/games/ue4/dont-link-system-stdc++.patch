@@ -1,0 +1,14 @@
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
+@@ -1827,6 +1827,11 @@
+ 			{
+ 				if (String.IsNullOrEmpty(Path.GetDirectoryName(AdditionalLibrary)))
+ 				{
++					if (AdditionalLibrary == "stdc++")
++					{
++						continue;
++					}
++
+ 					// library was passed just like "jemalloc", turn it into -ljemalloc
+ 					ExternalLibraries += string.Format(" -l{0}", AdditionalLibrary);
+ 				}
