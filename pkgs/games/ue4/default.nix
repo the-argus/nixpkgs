@@ -1,5 +1,5 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
-  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio }:
+  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev }:
 
 let
   deps = import ./cdn-deps.nix { inherit fetchurl; };
@@ -13,7 +13,7 @@ let
   libPath = lib.makeLibraryPath [
     xorg.libX11 xorg.libXScrnSaver xorg.libXau xorg.libXcursor xorg.libXext
     xorg.libXfixes xorg.libXi xorg.libXrandr xorg.libXrender xorg.libXxf86vm
-    xorg.libxcb vulkan-loader libpulseaudio
+    xorg.libxcb vulkan-loader libpulseaudio stdenv.cc.cc.lib udev
   ];
 in
 stdenv.mkDerivation rec {
