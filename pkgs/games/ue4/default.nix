@@ -18,12 +18,12 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "ue4";
-  version = "4.26.1";
+  version = "4.26.2";
    sourceRoot = "UnrealEngine-${version}-release";
   src = requireFile {
     name = "${sourceRoot}.zip";
     url = "https://github.com/EpicGames/UnrealEngine/releases/tag/${version}-release";
-    sha256 = "0nj7h3j68xxvjgli3gz9mrwj28mkm9wfv045fwvpfyffcbk6xs0h";
+    sha256 = "18w3kxfwjqkjhx4ssf6jy47xjsvixyhma7mxap430radq96gad5g";
   };
 
   UE_USE_SYSTEM_MONO = 1;
