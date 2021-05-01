@@ -88,6 +88,12 @@ stdenv.mkDerivation rec {
     chmod +x $out/bin/UE4Editor
 
     cp -r . "$sharedir"
+
+    # Indicate that this is an "installed" build of the engine.
+    # This will cause `FPaths::EngineUserDir` to return a different
+    # directory that belongs to the current user and is guaranteed
+    # to be writable.
+    touch $sharedir/Engine/Build/InstalledBuild.txt
   '';
   buildInputs = [ clang_10 lld_10 mono which xdg-user-dirs ];
 
