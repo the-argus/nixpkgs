@@ -1,5 +1,5 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
-  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev, libGL }:
+  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev, libGL, autoPatchelfHook }:
 
 let
   deps = import ./cdn-deps.nix { inherit fetchurl; };
@@ -96,6 +96,8 @@ stdenv.mkDerivation rec {
     touch $sharedir/Engine/Build/InstalledBuild.txt
   '';
   buildInputs = [ clang_10 lld_10 mono which xdg-user-dirs ];
+
+  nativeBuildInputs = [ autoPatchelfHook ];
 
   # Disable FORTIFY_SOURCE or `SharedPCH.UnrealEd.NonOptimized.ShadowErrors.h` fails to compile
   hardeningDisable = [ "fortify" ];
