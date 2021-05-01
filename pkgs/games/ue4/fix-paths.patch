@@ -1,0 +1,83 @@
+diff --git a/Engine/Plugins/Developer/VisualStudioCodeSourceCodeAccess/Source/VisualStudioCodeSourceCodeAccess/Private/VisualStudioCodeSourceCodeAccessor.cpp b/Engine/Plugins/Developer/VisualStudioCodeSourceCodeAccess/Source/VisualStudioCodeSourceCodeAccess/Private/VisualStudioCodeSourceCodeAccessor.cpp
+index d750e1c76ad..d78a6077831 100644
+--- a/Engine/Plugins/Developer/VisualStudioCodeSourceCodeAccess/Source/VisualStudioCodeSourceCodeAccess/Private/VisualStudioCodeSourceCodeAccessor.cpp
++++ b/Engine/Plugins/Developer/VisualStudioCodeSourceCodeAccess/Source/VisualStudioCodeSourceCodeAccess/Private/VisualStudioCodeSourceCodeAccessor.cpp
+@@ -89,7 +89,7 @@ void FVisualStudioCodeSourceCodeAccessor::RefreshAvailability()
+ 	FString OutURL;
+ 	int32 ReturnCode = -1;
+ 
+-	FPlatformProcess::ExecProcess(TEXT("/bin/bash"), TEXT("-c \"type -p code\""), &ReturnCode, &OutURL, nullptr);
++	FPlatformProcess::ExecProcess(TEXT("@bash@"), TEXT("-c \"type -p code\""), &ReturnCode, &OutURL, nullptr);
+ 	if (ReturnCode == 0)
+ 	{
+ 		Location.URL = OutURL.TrimStartAndEnd();
+diff --git a/Engine/Source/Developer/DesktopPlatform/Private/DesktopPlatformBase.cpp b/Engine/Source/Developer/DesktopPlatform/Private/DesktopPlatformBase.cpp
+index 29144a8e18a..86b42dd353b 100644
+--- a/Engine/Source/Developer/DesktopPlatform/Private/DesktopPlatformBase.cpp
++++ b/Engine/Source/Developer/DesktopPlatform/Private/DesktopPlatformBase.cpp
+@@ -737,7 +737,7 @@ FProcHandle FDesktopPlatformBase::InvokeUnrealBuildToolAsync(const FString& InCm
+ 	// Real men run Linux (with Mono??)
+ 	FString ScriptPath = FPaths::ConvertRelativePathToFull(FPaths::EngineDir() / TEXT("Build/BatchFiles/Linux/RunMono.sh"));
+ 	CmdLineParams = FString::Printf(TEXT("\"%s\" \"%s\" %s"), *ScriptPath, *ExecutableFileName, *CmdLineParams);
+-	ExecutableFileName = TEXT("/bin/bash");
++	ExecutableFileName = TEXT("@bash@");
+ #endif
+ 
+ 	// Run UnrealBuildTool
+@@ -1371,7 +1371,7 @@ bool FDesktopPlatformBase::BuildUnrealBuildTool(const FString& RootDir, FOutputD
+ 	else if (PLATFORM_LINUX)
+ 	{
+ 		FString ScriptPath = FPaths::ConvertRelativePathToFull(RootDir / TEXT("Engine/Build/BatchFiles/Linux/RunXBuild.sh"));
+-		CompilerExecutableFilename = TEXT("/bin/bash");
++		CompilerExecutableFilename = TEXT("@bash@");
+ 		CmdLineParams = FString::Printf(TEXT("\"%s\" /property:Configuration=Development %s"), *ScriptPath, *CsProjLocation);
+ 	}
+ 	else
+diff --git a/Engine/Source/Developer/DesktopPlatform/Private/Linux/DesktopPlatformLinux.cpp b/Engine/Source/Developer/DesktopPlatform/Private/Linux/DesktopPlatformLinux.cpp
+index 4137c757ffd..92162a21962 100644
+--- a/Engine/Source/Developer/DesktopPlatform/Private/Linux/DesktopPlatformLinux.cpp
++++ b/Engine/Source/Developer/DesktopPlatform/Private/Linux/DesktopPlatformLinux.cpp
+@@ -233,7 +233,7 @@ bool FDesktopPlatformLinux::IsSourceDistribution(const FString &RootDir)
+ static bool RunXDGUtil(FString XDGUtilCommand, FString* StdOut = nullptr)
+ {
+ 	// Run through bash incase xdg-utils is overriden via path.
+-	FString CommandLine = TEXT("/bin/bash");
++	FString CommandLine = TEXT("@bash@");
+ 
+ 	int32 ReturnCode;
+ 	if (FPlatformProcess::ExecProcess(*CommandLine, *XDGUtilCommand, &ReturnCode, StdOut, nullptr) && ReturnCode == 0)
+@@ -434,7 +434,7 @@ bool FDesktopPlatformLinux::RunUnrealBuildTool(const FText& Description, const F
+ 	FString CmdLineParams = FString::Printf(TEXT("\"%s\" \"%s\" %s"), *ScriptPath, *UnrealBuildToolPath, *Arguments);
+ 
+ 	// Spawn it with bash (and not sh) because of pushd
+-	return FFeedbackContextMarkup::PipeProcessOutput(Description, TEXT("/bin/bash"), CmdLineParams, Warn, &OutExitCode) && OutExitCode == 0;
++	return FFeedbackContextMarkup::PipeProcessOutput(Description, TEXT("@bash@"), CmdLineParams, Warn, &OutExitCode) && OutExitCode == 0;
+ }
+ 
+ bool FDesktopPlatformLinux::IsUnrealBuildToolRunning()
+diff --git a/Engine/Source/Developer/TargetPlatform/Private/TargetPlatformManagerModule.cpp b/Engine/Source/Developer/TargetPlatform/Private/TargetPlatformManagerModule.cpp
+index 91041343c0e..4d4cdd472c7 100644
+--- a/Engine/Source/Developer/TargetPlatform/Private/TargetPlatformManagerModule.cpp
++++ b/Engine/Source/Developer/TargetPlatform/Private/TargetPlatformManagerModule.cpp
+@@ -1006,7 +1006,7 @@ protected:
+ 		}
+ 		else if (PLATFORM_LINUX)
+ 		{
+-			CmdExe = TEXT("/bin/bash");	// bash and not sh because of pushd
++			CmdExe = TEXT("@bash@");	// bash and not sh because of pushd
+ 			FString ScriptPath = FPaths::ConvertRelativePathToFull(FPaths::EngineDir() / TEXT("Build/BatchFiles/Linux/RunMono.sh"));
+ 			CommandLine = TEXT("\"") + ScriptPath + TEXT("\" \"") + FPaths::ConvertRelativePathToFull(FPaths::EngineDir() / TEXT("Binaries/DotNET/UnrealBuildTool.exe")) + TEXT("\" -Mode=ValidatePlatforms");
+ 		}
+diff --git a/Engine/Source/Editor/UATHelper/UATHelperModule.cpp b/Engine/Source/Editor/UATHelper/UATHelperModule.cpp
+index fd7ec529107..370605df9c8 100644
+--- a/Engine/Source/Editor/UATHelper/UATHelperModule.cpp
++++ b/Engine/Source/Editor/UATHelper/UATHelperModule.cpp
+@@ -391,7 +391,7 @@ public:
+ 		FString CmdExe = TEXT("cmd.exe");
+ 	#elif PLATFORM_LINUX
+ 		FString RunUATScriptName = TEXT("RunUAT.sh");
+-		FString CmdExe = TEXT("/bin/bash");
++		FString CmdExe = TEXT("@bash@");
+ 	#else
+ 		FString RunUATScriptName = TEXT("RunUAT.command");
+ 		FString CmdExe = TEXT("/bin/sh");
