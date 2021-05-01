@@ -1,5 +1,6 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
-  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev, libGL, autoPatchelfHook }:
+  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev, libGL, autoPatchelfHook,
+  bash, substituteAll }:
 
 let
   deps = import ./cdn-deps.nix { inherit fetchurl; };
@@ -36,6 +37,10 @@ stdenv.mkDerivation rec {
     ./dont-link-system-stdc++.patch
     ./use-system-compiler.patch
     ./no-unused-result-error.patch
+    (substituteAll {
+      src = ./fix-paths.patch;
+      bash = "${bash}/bin/bash";
+    })
   ];
 
   configurePhase = ''
