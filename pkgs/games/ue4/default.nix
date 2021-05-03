@@ -1,6 +1,5 @@
 { lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
-  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev, libGL, autoPatchelfHook,
-  bash, substituteAll }:
+  xorg, xdg-user-dirs, vulkan-loader, libpulseaudio, udev, libGL, bash, substituteAll }:
 
 let
   deps = import ./cdn-deps.nix { inherit fetchurl; };
@@ -101,8 +100,6 @@ stdenv.mkDerivation rec {
     touch $sharedir/Engine/Build/InstalledBuild.txt
   '';
   buildInputs = [ clang_10 lld_10 mono which xdg-user-dirs ];
-
-  nativeBuildInputs = [ autoPatchelfHook ];
 
   outputs = [ "out" "debug" ];
 
