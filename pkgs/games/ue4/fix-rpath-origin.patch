@@ -1,0 +1,12 @@
+diff --git a/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs b/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
+index b952bbba819..9086ac312fc 100644
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
+@@ -2120,7 +2120,6 @@ namespace UnrealBuildTool
+
+ 					// should be the same as RelinkedFileRef
+ 					RelinkInvocation = RelinkInvocation.Replace(LinkOutputFileForwardSlashes, RelinkedFileForwardSlashes);
+-					RelinkInvocation = RelinkInvocation.Replace("$", "\\$");
+
+ 					if (bUseCmdExe)
+ 					{

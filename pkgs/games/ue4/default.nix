@@ -33,6 +33,10 @@ stdenv.mkDerivation rec {
   '';
 
   patches = [
+    # Remove the code that corrupts the rpaths of relinked libraries by
+    # turning `${ORIGIN}` into `\${ORIGIN}`.
+    ./fix-rpath-origin.patch
+
     ./dont-link-system-stdc++.patch
     ./use-system-compiler.patch
     ./no-unused-result-error.patch
