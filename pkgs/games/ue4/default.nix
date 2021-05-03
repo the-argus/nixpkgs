@@ -104,6 +104,36 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [ autoPatchelfHook ];
 
+  outputs = [ "out" "debug" ];
+
+  postFixup = ''
+    # UE4's build process automatically separates debug information. We just
+    # have to move it to a separate output.
+    pushd "$out"
+    while IFS= read -r -d $'\0' i; do
+      # Extract the Build ID. FIXME: there's probably a cleaner way.
+      id="$($READELF -n "$i" | sed 's/.*Build ID: \([0-9a-f]*\).*/\1/; t; d')"
+      if [ "''${#id}" -lt 2 ]; then
+        echo "could not find build ID of $i, skipping" >&2
+        continue
+      fi
+
+      # The `.build-id` directory, wherein GDB searches for debug info
+      i_dst1="$debug/lib/debug/.build-id/''${id:0:2}/''${id:2}.debug"
+
+      # Put another copy preserving the original directory structure just in
+      # case. (Putting all of them in a `$debug/lib/debug` will cause file name
+      # collisions because other platforms' precompiled binaries are present in $out)
+      i_dst2="$debug/$i"
+
+      mkdir -p "`dirname "$i_dst1"`"
+      mkdir -p "`dirname "$i_dst2"`"
+      mv "$i" "$i_dst1"
+      ln -sf "$i_dst1" "$i_dst2"
+    done < <(find . -type f -iname '*.debug' -print0)
+    popd
+  '';
+
   # Disable FORTIFY_SOURCE or `SharedPCH.UnrealEd.NonOptimized.ShadowErrors.h` fails to compile
   hardeningDisable = [ "fortify" ];
 
