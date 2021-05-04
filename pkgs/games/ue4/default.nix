@@ -91,6 +91,12 @@ stdenv.mkDerivation rec {
     cd "\$workdir/Engine/Binaries/Linux"
     export PATH="${xdg-user-dirs}/bin\''${PATH:+:}\$PATH"
     export LD_LIBRARY_PATH="${libPath}\''${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH"
+
+    # The `.so` files included in these third-party packages lack rpaths and
+    # fail to load other `.so` files in the same packages
+    export LD_LIBRARY_PATH="\$sharedir/Engine/Binaries/ThirdParty/PhysX3/Linux/x86_64-unknown-linux-gnu:\$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH="\$sharedir/Engine/Binaries/ThirdParty/nvTextureTools/Linux/x86_64-unknown-linux-gnu:\$LD_LIBRARY_PATH"
+
     exec ./UE4Editor "\$@"
     EOF
     chmod +x $out/bin/UE4Editor
