@@ -79,16 +79,7 @@ stdenv.mkDerivation rec {
 
     sharedir="$sharedir"
 
-    # Can't include spaces, so can't piggy-back off the other Unreal directory.
-    workdir="\$HOME/.config/unreal-engine-nix-workdir"
-    if [ ! -e "\$workdir" ]; then
-      mkdir -p "\$workdir"
-      ${xorg.lndir}/bin/lndir "\$sharedir" "\$workdir"
-      unlink "\$workdir/Engine/Binaries/Linux/UE4Editor"
-      cp "\$sharedir/Engine/Binaries/Linux/UE4Editor" "\$workdir/Engine/Binaries/Linux/UE4Editor"
-    fi
-
-    cd "\$workdir/Engine/Binaries/Linux"
+    cd "\$sharedir/Engine/Binaries/Linux"
     export PATH="${xdg-user-dirs}/bin\''${PATH:+:}\$PATH"
     export LD_LIBRARY_PATH="${libPath}\''${LD_LIBRARY_PATH:+:}\$LD_LIBRARY_PATH"
 
