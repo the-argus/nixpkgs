@@ -97,6 +97,9 @@ stdenv.mkDerivation rec {
     export LD_LIBRARY_PATH="\$sharedir/Engine/Binaries/ThirdParty/PhysX3/Linux/x86_64-unknown-linux-gnu:\$LD_LIBRARY_PATH"
     export LD_LIBRARY_PATH="\$sharedir/Engine/Binaries/ThirdParty/nvTextureTools/Linux/x86_64-unknown-linux-gnu:\$LD_LIBRARY_PATH"
 
+    # Plugins refer to `.so` files in the main executable directory
+    export LD_LIBRARY_PATH="\$sharedir/Engine/Binaries/Linux:\$LD_LIBRARY_PATH"
+
     exec ./UE4Editor "\$@"
     EOF
     chmod +x $out/bin/UE4Editor
