@@ -142,6 +142,16 @@ stdenv.mkDerivation rec {
       ln -sf "$i_dst1" "$i_dst2"
     done < <(find . -type f -iname '*.debug' -print0)
     popd
+
+    # Set ELF interpreters (but not rpaths)
+    pushd $out/share/UnrealEngine
+    for i in \
+      Engine/Binaries/ThirdParty/Mono/Linux/bin/mono \
+      Engine/Source/ThirdParty/CEF3/cef_binary_3.2623.1395.g3034273_linux64/Release/chrome-sandbox
+    do
+      patchelf --set-interpreter "${stdenv.cc.bintools.dynamicLinker}" "$i"
+    done
+    popd
   '';
 
   # Disable FORTIFY_SOURCE or `SharedPCH.UnrealEd.NonOptimized.ShadowErrors.h` fails to compile
