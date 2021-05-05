@@ -94,6 +94,10 @@ stdenv.mkDerivation rec {
     # Piggyback on the engine user-local directory
     export MONO_REGISTRY_PATH="\$HOME/.config/Epic/UnrealEngine/4.26/MonoRegistry"
 
+    # Use the system Mono
+    export PATH="${mono}/bin:\$PATH"
+    export UE_USE_SYSTEM_MONO=1
+
     exec ./UE4Editor "\$@"
     EOF
     chmod +x $out/bin/UE4Editor
@@ -140,7 +144,6 @@ stdenv.mkDerivation rec {
     # Set ELF interpreters (but not rpaths)
     pushd $out/share/UnrealEngine
     for i in \
-      Engine/Binaries/ThirdParty/Mono/Linux/bin/mono \
       Engine/Source/ThirdParty/CEF3/cef_binary_3.2623.1395.g3034273_linux64/Release/chrome-sandbox
     do
       patchelf --set-interpreter "${stdenv.cc.bintools.dynamicLinker}" "$i"
