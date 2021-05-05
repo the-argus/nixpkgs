@@ -91,6 +91,9 @@ stdenv.mkDerivation rec {
     # Plugins refer to `.so` files in the main executable directory
     export LD_LIBRARY_PATH="\$sharedir/Engine/Binaries/Linux:\$LD_LIBRARY_PATH"
 
+    # Piggyback on the engine user-local directory
+    export MONO_REGISTRY_PATH="\$HOME/.config/Epic/UnrealEngine/4.26/MonoRegistry"
+
     exec ./UE4Editor "\$@"
     EOF
     chmod +x $out/bin/UE4Editor
