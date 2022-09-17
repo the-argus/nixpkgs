@@ -1,0 +1,60 @@
+diff --git a/Engine/Source/Programs/UnrealBuildTool/Platform/Android/AndroidToolChain.cs b/Engine/Source/Programs/UnrealBuildTool/Platform/Android/AndroidToolChain.cs
+index 73f85eb5dcb..51f59a5ed2e 100644
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/Android/AndroidToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/Android/AndroidToolChain.cs
+@@ -1381,6 +1381,7 @@ namespace UnrealBuildTool
+ 			if (CompileEnvironment.PrecompiledHeaderAction != PrecompiledHeaderAction.Create)
+ 			{
+ 				BaseArguments += " -Werror";
++				BaseArguments += " -Wno-unused-result";
+ 
+ 			}
+ 
+diff --git a/Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs b/Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs
+index 109d782c63c..fb400254a17 100644
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs
+@@ -239,6 +239,7 @@ namespace UnrealBuildTool
+ 			}
+ 
+ 			Result += " -Wall -Werror";
++			Result += " -Wno-unused-result";
+ 			Result += " -Wdelete-non-virtual-dtor";
+ 
+ 			// clang 12.00 has a new warning for copies in ranged loops. Instances have all been fixed up (2020/6/26) but
+diff --git a/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs b/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
+index 54cf7934279..b2e669102b3 100644
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/Linux/LinuxToolChain.cs
+@@ -592,6 +592,7 @@ namespace UnrealBuildTool
+ 			}
+ 
+ 			Result += " -Wall -Werror";
++			Result += " -Wno-unused-result";
+ 
+ 			if (!CompileEnvironment.Architecture.StartsWith("x86_64") && !CompileEnvironment.Architecture.StartsWith("i686"))
+ 			{
+diff --git a/Engine/Source/Programs/UnrealBuildTool/Platform/Mac/MacToolChain.cs b/Engine/Source/Programs/UnrealBuildTool/Platform/Mac/MacToolChain.cs
+index 32094cfa30a..9875effafdc 100644
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/Mac/MacToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/Mac/MacToolChain.cs
+@@ -216,6 +216,7 @@ namespace UnrealBuildTool
+ 			}			
+ 
+ 			Result += " -Wall -Werror";
++			Result += " -Wno-unused-result";
+ 			Result += " -Wdelete-non-virtual-dtor";
+ 
+ 			// clang 12.00 has a new warning for copies in ranged loops. Instances have all been fixed up (2020/6/26) but
+diff --git a/Engine/Source/Programs/UnrealBuildTool/Platform/Windows/VCToolChain.cs b/Engine/Source/Programs/UnrealBuildTool/Platform/Windows/VCToolChain.cs
+index b35ed550dcd..4669741cb15 100644
+--- a/Engine/Source/Programs/UnrealBuildTool/Platform/Windows/VCToolChain.cs
++++ b/Engine/Source/Programs/UnrealBuildTool/Platform/Windows/VCToolChain.cs
+@@ -649,6 +649,7 @@ namespace UnrealBuildTool
+ 
+ 				// Treat all warnings as errors by default
+ 				Arguments.Add("-Werror");
++				Arguments.Add("-Wno-unused-result");
+ 
+ 				// Allow Microsoft-specific syntax to slide, even though it may be non-standard.  Needed for Windows headers.
+ 				Arguments.Add("-Wno-microsoft");

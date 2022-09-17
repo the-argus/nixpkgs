@@ -1,10 +1,10 @@
-{ lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang, mono, which,
+{ lib, stdenv, writeScript, fetchurl, requireFile, unzip, clang_10, lld_10, mono, which,
   xorg, xdg-user-dirs }:
 
 let
   deps = import ./cdn-deps.nix { inherit fetchurl; };
   linkDeps = writeScript "link-deps.sh" (lib.concatMapStringsSep "\n" (hash:
-    let prefix = lib.concatStrings (lib.take 2 (lib.stringToCharacters hash));
+    let prefix = lib.concatStrings (lib.take 2 (lib.stringToCharacters hash)); # TODO: Use UE4_GITDEPS instead
     in ''
       mkdir -p .git/ue4-gitdeps/${prefix}
       ln -s ${lib.getAttr hash deps} .git/ue4-gitdeps/${prefix}/${hash}
@@ -18,16 +18,25 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "ue4";
-  version = "4.10.2";
-  sourceRoot = "UnrealEngine-${version}-release";
+  version = "4.26.1";
+   sourceRoot = "UnrealEngine-${version}-release";
   src = requireFile {
     name = "${sourceRoot}.zip";
-    url = "https://github.com/EpicGames/UnrealEngine/releases/tag/${version}";
-    sha256 = "1rh6r2z00kjzq1i2235py65bg9i482az4rwr14kq9n4slr60wkk1";
+    url = "https://github.com/EpicGames/UnrealEngine/releases/tag/${version}-release";
+    sha256 = "0nj7h3j68xxvjgli3gz9mrwj28mkm9wfv045fwvpfyffcbk6xs0h";
   };
+
+  UE_USE_SYSTEM_MONO = 1;
+
   unpackPhase = ''
     ${unzip}/bin/unzip $src
   '';
+
+  patches = [
+    ./use-system-compiler.patch
+    ./no-unused-result-error.patch
+  ];
+
   configurePhase = ''
     ${linkDeps}
 
@@ -35,9 +44,18 @@ stdenv.mkDerivation rec {
     # deterministic. Let's just fail in that case.
     export http_proxy="nodownloads"
 
+    export HOME="$PWD/home"
+    mkdir -p "$HOME"
+
+    export MONO_REGISTRY_PATH="$PWD/mono-registry"
+    mkdir -p "$MONO_REGISTRY_PATH"
+
     patchShebangs Setup.sh
     patchShebangs Engine/Build/BatchFiles/Linux
     ./Setup.sh
+
+    find Engine/Binaries/Linux -type f -executable -exec patchelf --interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" {} \;
+
     ./GenerateProjectFiles.sh
   '';
 
@@ -69,7 +87,7 @@ stdenv.mkDerivation rec {
 
     cp -r . "$sharedir"
   '';
-  buildInputs = [ clang mono which xdg-user-dirs ];
+  buildInputs = [ clang_10 lld_10 mono which xdg-user-dirs ];
 
   meta = {
     description = "A suite of integrated tools for game developers to design and build games, simulations, and visualizations";
@@ -78,6 +96,5 @@ stdenv.mkDerivation rec {
     platforms = lib.platforms.linux;
     maintainers = [ ];
     # See issue https://github.com/NixOS/nixpkgs/issues/17162
-    broken = true;
   };
 }
