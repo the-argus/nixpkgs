@@ -3,7 +3,7 @@
 , callPackage
 , cmake
 , pkg-config
-, wrapQtAppsHook
+, qt6
 , wayland
 , elfutils
 , libbfd
@@ -15,13 +15,22 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [
     cmake
     pkg-config
-    wrapQtAppsHook
+    qt6.wrapQtAppsHook
   ];
 
   buildInputs = [
     wayland
     elfutils
     libbfd
+  ] ++ (with qt6; [
+    qtbase
+    qt5compat
+    qtdeclarative
+  ]);
+
+  cmakeFlags = [
+    "-DQT_VERSION_MAJOR=6"
+    "-DGAMMARAY_USE_PCH=OFF"
   ];
 
   meta = with lib; {
